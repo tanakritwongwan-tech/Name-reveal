@@ -117,9 +117,13 @@ button:active {
 
 <!-- ACT 2 -->
 <div id="act2" class="hidden box">
-<h3>MODULE 2: ROUTE GRID</h3>
-<div class="grid" id="grid"></div>
-<p id="routeText"></p>
+<h3>MODULE 2: MEMORY RECALL</h3>
+
+<p>Reconstruct the signal sequence</p>
+
+<div id="buttons"></div>
+
+<p id="progress"></p>
 </div>
 
 <!-- ACT 3 -->
@@ -208,40 +212,58 @@ function press() {
    ACT 2: GRID ROUTING
 ========================= */
 
-const gridData = [
-    "T",".",".","X",
-    ".","A",".",".",
-    ".",".","N",".",
-    ".",".",".","A"
-];
+let input = [];
+let target = ["T","A","N","A","K","R","I","T"];
 
 function loadGrid() {
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
+    document.getElementById("act2").style.display = "block";
 
-    gridData.forEach(v => {
-        const cell = document.createElement("div");
-        cell.className = "cell";
-        cell.innerText = v;
+    const letters = ["T","A","N","A","K","R","I","T","X","Q","Z"];
 
-        cell.onclick = () => {
-            if (v !== "." && v !== "X") {
-                GAME.route.push(v);
-                document.getElementById("routeText").innerText =
-                    "ROUTE: " + GAME.route.join(" ");
+    shuffle(letters);
+
+    const container = document.getElementById("buttons");
+    container.innerHTML = "";
+
+    letters.forEach(l => {
+        const btn = document.createElement("button");
+        btn.innerText = l;
+
+        btn.onclick = () => {
+            if(input.length < target.length) {
+                input.push(l);
             }
 
-            if (GAME.route.length >= 4) {
-                document.getElementById("act3").style.display = "block";
-                document.getElementById("brokenText").innerText =
-                    "T _ N A K _ I T";
+            document.getElementById("progress").innerText =
+                "INPUT: " + input.join("");
+
+            if(input.length === target.length) {
+                check();
             }
         };
 
-        grid.appendChild(cell);
+        container.appendChild(btn);
     });
 }
 
+function check() {
+    if(input.join("") === target.join("")) {
+        document.getElementById("act3").style.display = "block";
+        document.getElementById("brokenText").innerText =
+            "T _ N A K _ I T";
+    } else {
+        alert("SYSTEM ERROR: incorrect sequence");
+        input = [];
+        document.getElementById("progress").innerText = "";
+    }
+}
+
+function shuffle(a){
+    for(let i=a.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+    }
+}
 /* =========================
    ACT 3: REPAIR MODULE
 ========================= */
