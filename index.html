@@ -3,33 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NAMELOCK SYSTEM</title>
+<title>NEURAL BREAKOUT v4</title>
 
 <style>
 body {
     margin: 0;
-    background: #02040a;
+    background: #01030a;
     color: #00ff99;
     font-family: monospace;
     overflow-x: hidden;
+    text-align: center;
 }
 
-/* GLITCH EFFECT */
 .glitch {
-    animation: glitch 1s infinite;
+    animation: glitch 0.8s infinite;
 }
 
 @keyframes glitch {
     0% { text-shadow: 2px 0 red, -2px 0 blue; }
-    25% { text-shadow: -2px 0 red, 2px 0 blue; }
-    50% { text-shadow: 2px 2px red, -2px -2px blue; }
-    75% { text-shadow: -2px 2px red, 2px -2px blue; }
+    50% { text-shadow: -2px 0 red, 2px 0 blue; }
     100% { text-shadow: 2px 0 red, -2px 0 blue; }
-}
-
-.screen {
-    padding: 20px;
-    text-align: center;
 }
 
 .box {
@@ -41,7 +34,7 @@ body {
 
 button {
     width: 90%;
-    max-width: 300px;
+    max-width: 320px;
     padding: 15px;
     margin: 10px;
     background: black;
@@ -57,162 +50,163 @@ button:active {
 
 .hidden { display: none; }
 
-.block {
-    display: inline-block;
-    padding: 10px;
-    margin: 5px;
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin: 10px;
+}
+
+.tile {
     border: 1px solid #00ff99;
+    padding: 15px;
     cursor: pointer;
+    user-select: none;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin-top: 10px;
+    text-align: center;
 }
 </style>
 </head>
 
 <body>
 
-<div class="screen">
-
-<h1 class="glitch">SYSTEM CORRUPTION DETECTED</h1>
+<h1 class="glitch">NEURAL SYSTEM CORRUPTED</h1>
 
 <div class="box">
-<p>AI MEMORY CORE HAS BEEN DAMAGED</p>
-<p>OBJECTIVE: RECOVER USER NAME</p>
+<p>AI CORE SPLIT INTO 4 MODULES</p>
+<p>RECOVER USER IDENTITY TO RESTORE SYSTEM</p>
 </div>
 
-<button onclick="start()">INITIALIZE RECOVERY</button>
+<button onclick="start()">BOOT SYSTEM</button>
 
 <!-- ACT 1 -->
 <div id="act1" class="hidden box">
+<h3>MODULE 1: MEMORY TRACE</h3>
 <pre id="log"></pre>
 </div>
 
 <!-- ACT 2 -->
 <div id="act2" class="hidden box">
-<h3>MEMORY FRAGMENTS</h3>
-<p>Reconstruct the correct sequence</p>
-
-<div id="blocks"></div>
+<h3>MODULE 2: PATTERN GRID</h3>
+<p>Tap tiles in correct order</p>
+<div class="grid" id="grid"></div>
 </div>
 
 <!-- ACT 3 -->
 <div id="act3" class="hidden box">
-<h3>AI SECURITY FILTER</h3>
-<p>Enable correct logic layers</p>
-
-<label><input type="checkbox" id="a"> ASCII Decode</label><br>
-<label><input type="checkbox" id="b"> Reverse Engine</label><br>
-<label><input type="checkbox" id="c"> Noise Filter</label><br>
-
-<button onclick="finalCheck()">RUN SYSTEM</button>
+<h3>MODULE 3: ASCII RECONSTRUCTION</h3>
+<p>Decode system fragment:</p>
+<p>84 65 78 65 75 82 73 84</p>
+<input id="ascii" placeholder="decoded word">
+<button onclick="checkAscii()">VERIFY</button>
 </div>
 
-<!-- FINAL -->
-<div id="final" class="hidden box">
-<h2 class="glitch">ACCESS TERMINAL</h2>
-<input id="code" placeholder="enter recovered name">
-<button onclick="check()">UNLOCK</button>
+<!-- ACT 4 -->
+<div id="act4" class="hidden box">
+<h3>MODULE 4: FINAL AUTH</h3>
+<p>Enter reconstructed identity</p>
+<input id="finalInput" placeholder="???????">
+<button onclick="finalCheck()">UNLOCK</button>
 </div>
 
 <h2 id="win" class="hidden glitch">ACCESS GRANTED: TANAKRIT</h2>
 
-</div>
-
 <script>
-
-console.log("SYSTEM LOG: fragment detected -> ASCII base active");
-
-function start() {
-    document.getElementById("act1").style.display = "block";
-    runLog();
-}
 
 /* ---------------- ACT 1 ---------------- */
 
 let logs = [
-"Booting AI memory core...",
-"Scanning corrupted sectors...",
-"Fragment found: 84 65 78 65 75 82 73 84",
-"Warning: fake data detected",
-"Rebuilding structure..."
+"Initializing neural scan...",
+"Searching memory fragments...",
+"Detected pattern: T A N A K R I T",
+"Corruption level: 87%",
+"System unstable..."
 ];
 
 let i = 0;
 
-function runLog() {
-    let logBox = document.getElementById("log");
+function start() {
+    document.getElementById("act1").style.display = "block";
+    runLogs();
+}
+
+function runLogs() {
+    let box = document.getElementById("log");
 
     let interval = setInterval(() => {
         if (i < logs.length) {
-            logBox.innerHTML += logs[i] + "\n";
+            box.innerHTML += logs[i] + "\n";
             i++;
         } else {
             clearInterval(interval);
             document.getElementById("act2").style.display = "block";
-            loadBlocks();
+            loadGrid();
         }
-    }, 800);
+    }, 700);
 }
 
 /* ---------------- ACT 2 ---------------- */
 
-let fragments = [
-"T", "A", "N", "X",
-"A", "K", "Z", "R",
-"I", "T", "Q", "W"
-];
+let sequence = ["T","A","N","A","K","R","I","T"];
+let fake = ["X","Q","Z","W"];
 
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+let tiles = [...sequence, ...fake];
+
+function shuffle(a){
+    for(let i=a.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
     }
 }
+shuffle(tiles);
 
-shuffle(fragments);
+let user = [];
 
-function loadBlocks() {
-    let container = document.getElementById("blocks");
-    container.innerHTML = "";
+function loadGrid() {
+    let grid = document.getElementById("grid");
+    grid.innerHTML = "";
 
-    fragments.forEach(f => {
+    tiles.forEach(t => {
         let div = document.createElement("div");
-        div.className = "block";
-        div.innerHTML = f;
-        div.onclick = () => select(div);
-        container.appendChild(div);
+        div.className = "tile";
+        div.innerText = t;
+        div.onclick = () => pick(t, div);
+        grid.appendChild(div);
     });
 }
 
-let selected = "";
-
-function select(el) {
-    selected += el.innerText;
+function pick(t, el){
+    user.push(t);
     el.style.opacity = "0.3";
 
-    if (selected.length >= 8) {
+    if(user.length === 8){
         document.getElementById("act3").style.display = "block";
     }
 }
 
 /* ---------------- ACT 3 ---------------- */
 
-function finalCheck() {
-    let a = document.getElementById("a").checked;
-    let b = document.getElementById("b").checked;
-    let c = document.getElementById("c").checked;
+function checkAscii(){
+    let val = document.getElementById("ascii").value.toLowerCase();
 
-    if (a && b && !c) {
-        document.getElementById("final").style.display = "block";
+    if(val === "tanakrit"){
+        document.getElementById("act4").style.display = "block";
     } else {
-        alert("SYSTEM REJECTED: wrong logic layers");
+        alert("DECODE FAILED");
     }
 }
 
-/* ---------------- FINAL ---------------- */
+/* ---------------- ACT 4 ---------------- */
 
-function check() {
-    let val = document.getElementById("code").value.toLowerCase();
+function finalCheck(){
+    let val = document.getElementById("finalInput").value.toLowerCase();
 
-    if (val === "tanakrit") {
+    if(val === "tanakrit"){
         document.getElementById("win").style.display = "block";
     } else {
         alert("ACCESS DENIED");
