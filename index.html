@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEURAL BREAKOUT v4</title>
+<title>NEURAL ARCHIVE v4</title>
 
 <style>
 body {
     margin: 0;
-    background: #01030a;
+    background: #02040a;
     color: #00ff99;
     font-family: monospace;
-    overflow-x: hidden;
     text-align: center;
 }
 
+/* glitch effect */
 .glitch {
     animation: glitch 0.8s infinite;
 }
@@ -35,7 +35,7 @@ body {
 button {
     width: 90%;
     max-width: 320px;
-    padding: 15px;
+    padding: 14px;
     margin: 10px;
     background: black;
     color: #00ff99;
@@ -57,75 +57,78 @@ button:active {
     margin: 10px;
 }
 
-.tile {
+.cell {
     border: 1px solid #00ff99;
-    padding: 15px;
+    padding: 12px;
     cursor: pointer;
     user-select: none;
 }
 
-input {
-    width: 90%;
-    padding: 10px;
-    margin-top: 10px;
-    text-align: center;
+.small {
+    font-size: 14px;
+    opacity: 0.8;
 }
 </style>
 </head>
 
 <body>
 
-<h1 class="glitch">NEURAL SYSTEM CORRUPTED</h1>
+<h2 class="glitch">NEURAL ARCHIVE CORRUPTED</h2>
 
 <div class="box">
-<p>AI CORE SPLIT INTO 4 MODULES</p>
-<p>RECOVER USER IDENTITY TO RESTORE SYSTEM</p>
+<p>Identity is not stored.</p>
+<p>Identity is computed from fragments.</p>
 </div>
 
-<button onclick="start()">BOOT SYSTEM</button>
+<button onclick="start()">INITIALIZE RECOVERY</button>
 
 <!-- ACT 1 -->
 <div id="act1" class="hidden box">
-<h3>MODULE 1: MEMORY TRACE</h3>
+<h3>PHASE 1: MEMORY TRACE</h3>
 <pre id="log"></pre>
 </div>
 
 <!-- ACT 2 -->
 <div id="act2" class="hidden box">
-<h3>MODULE 2: PATTERN GRID</h3>
-<p>Tap tiles in correct order</p>
-<div class="grid" id="grid"></div>
+<h3>PHASE 2: FILTER PIPELINE</h3>
+<p class="small">Choose correct processing order</p>
+
+<button onclick="step('ascii')">ASCII DECODE</button>
+<button onclick="step('noise')">NOISE FILTER</button>
+<button onclick="step('reverse')">REVERSE ENGINE</button>
+
+<p id="pipeline"></p>
 </div>
 
 <!-- ACT 3 -->
 <div id="act3" class="hidden box">
-<h3>MODULE 3: ASCII RECONSTRUCTION</h3>
-<p>Decode system fragment:</p>
-<p>84 65 78 65 75 82 73 84</p>
-<input id="ascii" placeholder="decoded word">
-<button onclick="checkAscii()">VERIFY</button>
+<h3>PHASE 3: MEMORY GRID</h3>
+<p class="small">Recover missing fragments</p>
+
+<div class="grid" id="grid"></div>
 </div>
 
 <!-- ACT 4 -->
 <div id="act4" class="hidden box">
-<h3>MODULE 4: FINAL AUTH</h3>
-<p>Enter reconstructed identity</p>
-<input id="finalInput" placeholder="???????">
-<button onclick="finalCheck()">UNLOCK</button>
+<h3>PHASE 4: FINAL COMPUTATION</h3>
+<p>Execute identity reconstruction</p>
+
+<button onclick="compute()">RUN CORE</button>
 </div>
 
-<h2 id="win" class="hidden glitch">ACCESS GRANTED: TANAKRIT</h2>
+<!-- FINAL -->
+<h2 id="win" class="hidden glitch">IDENTITY CONFIRMED: TANAKRIT</h2>
 
 <script>
 
 /* ---------------- ACT 1 ---------------- */
 
 let logs = [
-"Initializing neural scan...",
-"Searching memory fragments...",
-"Detected pattern: T A N A K R I T",
-"Corruption level: 87%",
-"System unstable..."
+"Boot sequence initiated...",
+"Scanning memory fragments...",
+"Detected raw sequence:",
+"84 65 78 65 75 82 73 84",
+"Entropy stable..."
 ];
 
 let i = 0;
@@ -145,17 +148,47 @@ function runLogs() {
         } else {
             clearInterval(interval);
             document.getElementById("act2").style.display = "block";
-            loadGrid();
         }
     }, 700);
 }
 
 /* ---------------- ACT 2 ---------------- */
 
-let sequence = ["T","A","N","A","K","R","I","T"];
-let fake = ["X","Q","Z","W"];
+let order = [];
+let correct = ["ascii", "reverse", "noise"];
 
-let tiles = [...sequence, ...fake];
+function step(x) {
+    order.push(x);
+
+    document.getElementById("pipeline").innerText =
+        "Pipeline: " + order.join(" → ");
+
+    if (order.length === 3) {
+        checkOrder();
+    }
+}
+
+function checkOrder() {
+    let ok = JSON.stringify(order) === JSON.stringify(correct);
+
+    if (ok) {
+        document.getElementById("act3").style.display = "block";
+        loadGrid();
+    } else {
+        alert("SYSTEM ERROR: wrong pipeline order");
+        order = [];
+        document.getElementById("pipeline").innerText = "";
+    }
+}
+
+/* ---------------- ACT 3 ---------------- */
+
+let fragments = [
+"T","A","N","A","K","R","I","T",
+"X","Q","Z","W"
+];
+
+let selected = [];
 
 function shuffle(a){
     for(let i=a.length-1;i>0;i--){
@@ -163,53 +196,45 @@ function shuffle(a){
         [a[i],a[j]]=[a[j],a[i]];
     }
 }
-shuffle(tiles);
-
-let user = [];
 
 function loadGrid() {
     let grid = document.getElementById("grid");
     grid.innerHTML = "";
 
-    tiles.forEach(t => {
+    shuffle(fragments);
+
+    fragments.forEach(f => {
         let div = document.createElement("div");
-        div.className = "tile";
-        div.innerText = t;
-        div.onclick = () => pick(t, div);
+        div.className = "cell";
+        div.innerText = f;
+
+        div.onclick = () => pick(f, div);
+
         grid.appendChild(div);
     });
 }
 
-function pick(t, el){
-    user.push(t);
-    el.style.opacity = "0.3";
-
-    if(user.length === 8){
-        document.getElementById("act3").style.display = "block";
+function pick(f, el) {
+    if(selected.length < 8) {
+        selected.push(f);
+        el.style.opacity = "0.3";
     }
-}
 
-/* ---------------- ACT 3 ---------------- */
-
-function checkAscii(){
-    let val = document.getElementById("ascii").value.toLowerCase();
-
-    if(val === "tanakrit"){
+    if(selected.length === 8) {
         document.getElementById("act4").style.display = "block";
-    } else {
-        alert("DECODE FAILED");
     }
 }
 
 /* ---------------- ACT 4 ---------------- */
 
-function finalCheck(){
-    let val = document.getElementById("finalInput").value.toLowerCase();
+function compute() {
+    // hidden reconstruction logic
+    let result = selected.join("");
 
-    if(val === "tanakrit"){
+    if(result.includes("T") && result.includes("A") && result.includes("N")) {
         document.getElementById("win").style.display = "block";
     } else {
-        alert("ACCESS DENIED");
+        alert("CORE FAILURE");
     }
 }
 
