@@ -2,72 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Level 7 Puzzle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SECURE TERMINAL v2</title>
+
 <style>
-    body {
-        background: black;
-        color: #00ff88;
-        font-family: monospace;
-        text-align: center;
-        padding-top: 80px;
-    }
+body {
+    background: #05070a;
+    color: #00ff99;
+    font-family: monospace;
+    text-align: center;
+    padding: 20px;
+}
 
-    .box {
-        border: 1px solid #00ff88;
-        display: inline-block;
-        padding: 20px;
-        margin-top: 20px;
-    }
+.terminal {
+    border: 1px solid #00ff99;
+    padding: 15px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    margin: auto;
+    text-align: left;
+}
 
-    button {
-        background: black;
-        color: #00ff88;
-        border: 1px solid #00ff88;
-        padding: 10px 20px;
-        cursor: pointer;
-    }
+button {
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+    margin: 10px;
+    background: black;
+    color: #00ff99;
+    border: 1px solid #00ff99;
+    border-radius: 10px;
+}
 
-    button:hover {
-        background: #00ff88;
-        color: black;
-    }
+input {
+    width: 90%;
+    max-width: 350px;
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 10px;
+}
 
-    .hidden {
-        display: none;
-        margin-top: 20px;
-    }
+.hidden { display: none; }
+
+.cursor {
+    display: inline-block;
+    width: 10px;
+    background: #00ff99;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
 </style>
 </head>
 
 <body>
 
-<h1>LEVEL 7 ACCESS REQUIRED</h1>
+<h2>🔐 SECURE SYSTEM v2</h2>
 
-<p class="box">
-The system does not store answers.<br>
-It only stores observations.
-</p>
+<div class="terminal">
+<pre id="screen">Booting system...</pre>
+</div>
 
-<button onclick="reveal()">Request Hint</button>
+<button onclick="runHack()">RUN DIAGNOSTIC</button>
 
-<p id="hint" class="hidden">
-Today Algorithms Need A Knowledgeable Researcher In Training
-</p>
+<div id="puzzle" class="hidden">
+    <p>Decode this sequence:</p>
+    <pre>
+84 65 78 65 75 82 73 84
+    </pre>
 
-<p id="final" class="hidden">
-ACCESS GRANTED: TANAKRIT
-</p>
+    <p>Hint: convert numbers → letters</p>
+
+    <input id="code" placeholder="enter decoded word">
+    <button onclick="check()">UNLOCK</button>
+</div>
+
+<h2 id="result" class="hidden">ACCESS GRANTED: TANAKRIT</h2>
 
 <script>
-// hidden console clue (juniors might miss this)
-console.log("Hint: first letters matter.");
+let screen = document.getElementById("screen");
 
-function reveal() {
-    document.getElementById("hint").style.display = "block";
+let text = [
+"Loading modules...",
+"Bypassing security...",
+"Checking identity hash...",
+"WARNING: name fragment detected",
+"System unstable..."
+];
 
-    setTimeout(() => {
-        document.getElementById("final").style.display = "block";
-    }, 2000);
+let i = 0;
+
+function runHack() {
+    screen.innerHTML = "";
+    typeLine();
+}
+
+function typeLine() {
+    if (i < text.length) {
+        screen.innerHTML += text[i] + "\\n";
+        i++;
+        setTimeout(typeLine, 800);
+    } else {
+        document.getElementById("puzzle").style.display = "block";
+    }
+}
+
+// ASCII decoder
+function check() {
+    let val = document.getElementById("code").value.toLowerCase();
+
+    if (val === "tanakrit") {
+        document.getElementById("result").style.display = "block";
+    } else {
+        alert("Wrong. Try converting ASCII numbers.");
+    }
 }
 </script>
 
