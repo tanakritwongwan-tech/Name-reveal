@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEURAL ARCHIVE v4</title>
+<title>NEURAL BREAKOUT PRO</title>
 
 <style>
 body {
@@ -14,16 +14,7 @@ body {
     text-align: center;
 }
 
-/* glitch effect */
-.glitch {
-    animation: glitch 0.8s infinite;
-}
-
-@keyframes glitch {
-    0% { text-shadow: 2px 0 red, -2px 0 blue; }
-    50% { text-shadow: -2px 0 red, 2px 0 blue; }
-    100% { text-shadow: 2px 0 red, -2px 0 blue; }
-}
+h1 { margin-top: 20px; }
 
 .box {
     border: 1px solid #00ff99;
@@ -53,7 +44,7 @@ button:active {
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
+    gap: 6px;
     margin: 10px;
 }
 
@@ -64,88 +55,126 @@ button:active {
     user-select: none;
 }
 
-.small {
-    font-size: 14px;
-    opacity: 0.8;
+.glitch {
+    animation: glitch 0.8s infinite;
+}
+
+@keyframes glitch {
+    0% { text-shadow: 2px 0 red, -2px 0 blue; }
+    50% { text-shadow: -2px 0 red, 2px 0 blue; }
+    100% { text-shadow: 2px 0 red, -2px 0 blue; }
+}
+
+.bar-wrap {
+    width: 90%;
+    height: 25px;
+    border: 1px solid #00ff99;
+    margin: auto;
+    position: relative;
+}
+
+.bar {
+    width: 10px;
+    height: 25px;
+    background: #00ff99;
+    position: absolute;
+    left: 0;
+}
+
+.zone {
+    width: 30%;
+    height: 25px;
+    background: red;
+    opacity: 0.3;
+    position: absolute;
+    left: 40%;
 }
 </style>
 </head>
 
 <body>
 
-<h2 class="glitch">NEURAL ARCHIVE CORRUPTED</h2>
+<h1 class="glitch">NEURAL BREAKOUT SYSTEM</h1>
 
 <div class="box">
-<p>Identity is not stored.</p>
-<p>Identity is computed from fragments.</p>
+<p>4-stage identity reconstruction protocol</p>
 </div>
 
-<button onclick="start()">INITIALIZE RECOVERY</button>
+<button onclick="startGame()">START</button>
 
 <!-- ACT 1 -->
 <div id="act1" class="hidden box">
-<h3>PHASE 1: MEMORY TRACE</h3>
-<pre id="log"></pre>
+<h3>MODULE 1: SIGNAL TIMING</h3>
+
+<div class="bar-wrap">
+    <div id="bar" class="bar"></div>
+    <div class="zone"></div>
+</div>
+
+<button onclick="press()">PRESS SIGNAL</button>
+<p id="status"></p>
 </div>
 
 <!-- ACT 2 -->
 <div id="act2" class="hidden box">
-<h3>PHASE 2: FILTER PIPELINE</h3>
-<p class="small">Choose correct processing order</p>
-
-<button onclick="step('ascii')">ASCII DECODE</button>
-<button onclick="step('noise')">NOISE FILTER</button>
-<button onclick="step('reverse')">REVERSE ENGINE</button>
-
-<p id="pipeline"></p>
+<h3>MODULE 2: ROUTE GRID</h3>
+<div class="grid" id="grid"></div>
+<p id="routeText"></p>
 </div>
 
 <!-- ACT 3 -->
 <div id="act3" class="hidden box">
-<h3>PHASE 3: MEMORY GRID</h3>
-<p class="small">Recover missing fragments</p>
-
-<div class="grid" id="grid"></div>
+<h3>MODULE 3: MEMORY REPAIR</h3>
+<p id="brokenText"></p>
+<button onclick="repair()">REPAIR SYSTEM</button>
 </div>
 
 <!-- ACT 4 -->
 <div id="act4" class="hidden box">
-<h3>PHASE 4: FINAL COMPUTATION</h3>
-<p>Execute identity reconstruction</p>
-
-<button onclick="compute()">RUN CORE</button>
+<h3>MODULE 4: FINAL ASSEMBLY</h3>
+<button onclick="finalize()">RUN CORE</button>
 </div>
 
-<!-- FINAL -->
-<h2 id="win" class="hidden glitch">IDENTITY CONFIRMED: TANAKRIT</h2>
+<h2 id="win" class="hidden glitch">ACCESS GRANTED: TANAKRIT</h2>
 
 <script>
 
-/* ---------------- ACT 1 ---------------- */
-<div id="act1" class="hidden box">
-<h3>MODULE 1: SIGNAL STRIKE</h3>
+/* =========================
+   CLEAN STATE SYSTEM
+========================= */
 
-<p>Press ONLY when bar is inside RED zone</p>
+const GAME = {
+    signal: [],
+    route: [],
+    fixed: [],
+    final: []
+};
 
-<div style="width:90%;height:25px;border:1px solid #00ff99;position:relative;margin:auto;">
-    <div id="bar" style="width:10px;height:25px;background:#00ff99;position:absolute;left:0;"></div>
+const letters = ["T","A","N","A","K","R","I","T"];
 
-    <div style="width:30%;height:25px;background:red;opacity:0.3;position:absolute;left:40%;"></div>
-</div>
+/* =========================
+   STAGE CONTROL
+========================= */
 
-<button onclick="pressBar()">PRESS</button>
+function startGame() {
+    document.getElementById("act1").style.display = "block";
+    startBar();
+}
 
-<p id="status"></p>
-</div>
+/* =========================
+   ACT 1: TIMING BAR GAME
+========================= */
+
 let pos = 0;
 let dir = 2;
 let index = 0;
 
-let letters = ["T","A","N","A","K","R","I","T"];
-state.signal = [];
+function startBar() {
+    requestAnimationFrame(moveBar);
+}
 
 function moveBar() {
-    let bar = document.getElementById("bar");
+    const bar = document.getElementById("bar");
 
     pos += dir;
 
@@ -156,115 +185,81 @@ function moveBar() {
     requestAnimationFrame(moveBar);
 }
 
-function pressBar() {
-    let status = document.getElementById("status");
+function press() {
+    const status = document.getElementById("status");
 
-    // RED ZONE = 40% → 70%
     if (pos > 40 && pos < 70) {
-        state.signal.push(letters[index]);
+        GAME.signal.push(letters[index]);
         status.innerText = "GOOD SIGNAL ✔";
         index++;
     } else {
-        status.innerText = "NOISE DETECTED ✖";
+        status.innerText = "NOISE ✖";
     }
 
     if (index === 8) {
-        status.innerText = "MODULE COMPLETE";
-
-        // move to next stage
         setTimeout(() => {
             document.getElementById("act2").style.display = "block";
-            loadGrid(); // your existing ACT 2 function
-        }, 800);
-    }
-}
-function start() {
-    document.getElementById("act1").style.display = "block";
-    moveBar(); // IMPORTANT
-}
-/* ---------------- ACT 2 ---------------- */
-
-let order = [];
-let correct = ["ascii", "reverse", "noise"];
-
-function step(x) {
-    order.push(x);
-
-    document.getElementById("pipeline").innerText =
-        "Pipeline: " + order.join(" → ");
-
-    if (order.length === 3) {
-        checkOrder();
+            loadGrid();
+        }, 500);
     }
 }
 
-function checkOrder() {
-    let ok = JSON.stringify(order) === JSON.stringify(correct);
+/* =========================
+   ACT 2: GRID ROUTING
+========================= */
 
-    if (ok) {
-        document.getElementById("act3").style.display = "block";
-        loadGrid();
-    } else {
-        alert("SYSTEM ERROR: wrong pipeline order");
-        order = [];
-        document.getElementById("pipeline").innerText = "";
-    }
-}
-
-/* ---------------- ACT 3 ---------------- */
-
-let fragments = [
-"T","A","N","A","K","R","I","T",
-"X","Q","Z","W"
+const gridData = [
+    "T",".",".","X",
+    ".","A",".",".",
+    ".",".","N",".",
+    ".",".",".","A"
 ];
 
-let selected = [];
-
-function shuffle(a){
-    for(let i=a.length-1;i>0;i--){
-        let j=Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
-    }
-}
-
 function loadGrid() {
-    let grid = document.getElementById("grid");
+    const grid = document.getElementById("grid");
     grid.innerHTML = "";
 
-    shuffle(fragments);
+    gridData.forEach(v => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.innerText = v;
 
-    fragments.forEach(f => {
-        let div = document.createElement("div");
-        div.className = "cell";
-        div.innerText = f;
+        cell.onclick = () => {
+            if (v !== "." && v !== "X") {
+                GAME.route.push(v);
+                document.getElementById("routeText").innerText =
+                    "ROUTE: " + GAME.route.join(" ");
+            }
 
-        div.onclick = () => pick(f, div);
+            if (GAME.route.length >= 4) {
+                document.getElementById("act3").style.display = "block";
+                document.getElementById("brokenText").innerText =
+                    "T _ N A K _ I T";
+            }
+        };
 
-        grid.appendChild(div);
+        grid.appendChild(cell);
     });
 }
 
-function pick(f, el) {
-    if(selected.length < 8) {
-        selected.push(f);
-        el.style.opacity = "0.3";
-    }
+/* =========================
+   ACT 3: REPAIR MODULE
+========================= */
 
-    if(selected.length === 8) {
-        document.getElementById("act4").style.display = "block";
-    }
+function repair() {
+    GAME.fixed = ["T","A","N","A","K","R","I","T"];
+    document.getElementById("act4").style.display = "block";
 }
 
-/* ---------------- ACT 4 ---------------- */
+/* =========================
+   ACT 4: FINAL BUILD
+========================= */
 
-function compute() {
-    // hidden reconstruction logic
-    let result = selected.join("");
+function finalize() {
+    GAME.final = GAME.fixed.join("");
 
-    if(result.includes("T") && result.includes("A") && result.includes("N")) {
+    if (GAME.final === "TANAKRIT") {
         document.getElementById("win").style.display = "block";
-    } else {
-        alert("CORE FAILURE");
     }
 }
 
