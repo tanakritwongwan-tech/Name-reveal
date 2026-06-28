@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Registry Decryption</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .console-box {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+        }
+        .accent-text { color: #7ee787; }
+        .hidden-name {
+            display: none;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            border-left: 4px solid #7ee787;
+            padding-left: 10px;
+        }
+        button {
+            background-color: #238636;
+            color: #ffffff;
+            border: 1px solid rgba(240,246,252,0.1);
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            font-family: inherit;
+            margin-top: 15px;
+        }
+        button:hover { background-color: #2ea043; }
+    </style>
+</head>
+<body>
+
+<div class="console-box">
+    <p>> <span class="accent-text">sys.status:</span> Connected to internal network...</p>
+    <p>> Fetching string block metadata...</p>
+    <p>> Processing reduction parameters...</p>
+    
+    <button id="decryptBtn">Run functools.reduce()</button>
+    <div id="resultName" class="hidden-name">> TANAKRIT</div>
+</div>
+
+<script>
+    document.getElementById('decryptBtn').addEventListener('click', function() {
+        this.style.display = 'none';
+        const nameElement = document.getElementById('resultName');
+        nameElement.style.display = 'block';
+    });
+</script>
+
+</body>
+</html>
