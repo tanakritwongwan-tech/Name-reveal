@@ -122,36 +122,66 @@ button:active {
 <script>
 
 /* ---------------- ACT 1 ---------------- */
+<div id="act1" class="hidden box">
+<h3>MODULE 1: SIGNAL STRIKE</h3>
 
-let logs = [
-"Boot sequence initiated...",
-"Scanning memory fragments...",
-"Detected raw sequence:",
-"84 65 78 65 75 82 73 84",
-"Entropy stable..."
-];
+<p>Press ONLY when bar is inside RED zone</p>
 
-let i = 0;
+<div style="width:90%;height:25px;border:1px solid #00ff99;position:relative;margin:auto;">
+    <div id="bar" style="width:10px;height:25px;background:#00ff99;position:absolute;left:0;"></div>
 
+    <div style="width:30%;height:25px;background:red;opacity:0.3;position:absolute;left:40%;"></div>
+</div>
+
+<button onclick="pressBar()">PRESS</button>
+
+<p id="status"></p>
+</div>
+let pos = 0;
+let dir = 2;
+let index = 0;
+
+let letters = ["T","A","N","A","K","R","I","T"];
+state.signal = [];
+
+function moveBar() {
+    let bar = document.getElementById("bar");
+
+    pos += dir;
+
+    if (pos > 90 || pos < 0) dir *= -1;
+
+    bar.style.left = pos + "%";
+
+    requestAnimationFrame(moveBar);
+}
+
+function pressBar() {
+    let status = document.getElementById("status");
+
+    // RED ZONE = 40% → 70%
+    if (pos > 40 && pos < 70) {
+        state.signal.push(letters[index]);
+        status.innerText = "GOOD SIGNAL ✔";
+        index++;
+    } else {
+        status.innerText = "NOISE DETECTED ✖";
+    }
+
+    if (index === 8) {
+        status.innerText = "MODULE COMPLETE";
+
+        // move to next stage
+        setTimeout(() => {
+            document.getElementById("act2").style.display = "block";
+            loadGrid(); // your existing ACT 2 function
+        }, 800);
+    }
+}
 function start() {
     document.getElementById("act1").style.display = "block";
-    runLogs();
+    moveBar(); // IMPORTANT
 }
-
-function runLogs() {
-    let box = document.getElementById("log");
-
-    let interval = setInterval(() => {
-        if (i < logs.length) {
-            box.innerHTML += logs[i] + "\n";
-            i++;
-        } else {
-            clearInterval(interval);
-            document.getElementById("act2").style.display = "block";
-        }
-    }, 700);
-}
-
 /* ---------------- ACT 2 ---------------- */
 
 let order = [];
