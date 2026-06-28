@@ -3,30 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SECURE TERMINAL v2</title>
+<title>NAMELOCK SYSTEM</title>
 
 <style>
 body {
-    background: #05070a;
+    margin: 0;
+    background: #02040a;
     color: #00ff99;
     font-family: monospace;
-    text-align: center;
-    padding: 20px;
+    overflow-x: hidden;
 }
 
-.terminal {
+/* GLITCH EFFECT */
+.glitch {
+    animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+    0% { text-shadow: 2px 0 red, -2px 0 blue; }
+    25% { text-shadow: -2px 0 red, 2px 0 blue; }
+    50% { text-shadow: 2px 2px red, -2px -2px blue; }
+    75% { text-shadow: -2px 2px red, 2px -2px blue; }
+    100% { text-shadow: 2px 0 red, -2px 0 blue; }
+}
+
+.screen {
+    padding: 20px;
+    text-align: center;
+}
+
+.box {
     border: 1px solid #00ff99;
+    margin: 10px;
     padding: 15px;
     border-radius: 10px;
-    width: 90%;
-    max-width: 450px;
-    margin: auto;
-    text-align: left;
 }
 
 button {
     width: 90%;
-    max-width: 350px;
+    max-width: 300px;
     padding: 15px;
     margin: 10px;
     background: black;
@@ -35,92 +50,175 @@ button {
     border-radius: 10px;
 }
 
-input {
-    width: 90%;
-    max-width: 350px;
-    padding: 12px;
-    text-align: center;
-    font-size: 16px;
-    margin-top: 10px;
+button:active {
+    background: #00ff99;
+    color: black;
 }
 
 .hidden { display: none; }
 
-.cursor {
+.block {
     display: inline-block;
-    width: 10px;
-    background: #00ff99;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    50% { opacity: 0; }
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #00ff99;
+    cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🔐 SECURE SYSTEM v2</h2>
+<div class="screen">
 
-<div class="terminal">
-<pre id="screen">Booting system...</pre>
+<h1 class="glitch">SYSTEM CORRUPTION DETECTED</h1>
+
+<div class="box">
+<p>AI MEMORY CORE HAS BEEN DAMAGED</p>
+<p>OBJECTIVE: RECOVER USER NAME</p>
 </div>
 
-<button onclick="runHack()">RUN DIAGNOSTIC</button>
+<button onclick="start()">INITIALIZE RECOVERY</button>
 
-<div id="puzzle" class="hidden">
-    <p>Decode this sequence:</p>
-    <pre>
-84 65 78 65 75 82 73 84
-    </pre>
-
-    <p>Hint: convert numbers → letters</p>
-
-    <input id="code" placeholder="enter decoded word">
-    <button onclick="check()">UNLOCK</button>
+<!-- ACT 1 -->
+<div id="act1" class="hidden box">
+<pre id="log"></pre>
 </div>
 
-<h2 id="result" class="hidden">ACCESS GRANTED: TANAKRIT</h2>
+<!-- ACT 2 -->
+<div id="act2" class="hidden box">
+<h3>MEMORY FRAGMENTS</h3>
+<p>Reconstruct the correct sequence</p>
+
+<div id="blocks"></div>
+</div>
+
+<!-- ACT 3 -->
+<div id="act3" class="hidden box">
+<h3>AI SECURITY FILTER</h3>
+<p>Enable correct logic layers</p>
+
+<label><input type="checkbox" id="a"> ASCII Decode</label><br>
+<label><input type="checkbox" id="b"> Reverse Engine</label><br>
+<label><input type="checkbox" id="c"> Noise Filter</label><br>
+
+<button onclick="finalCheck()">RUN SYSTEM</button>
+</div>
+
+<!-- FINAL -->
+<div id="final" class="hidden box">
+<h2 class="glitch">ACCESS TERMINAL</h2>
+<input id="code" placeholder="enter recovered name">
+<button onclick="check()">UNLOCK</button>
+</div>
+
+<h2 id="win" class="hidden glitch">ACCESS GRANTED: TANAKRIT</h2>
+
+</div>
 
 <script>
-let screen = document.getElementById("screen");
 
-let text = [
-"Loading modules...",
-"Bypassing security...",
-"Checking identity hash...",
-"WARNING: name fragment detected",
-"System unstable..."
+console.log("SYSTEM LOG: fragment detected -> ASCII base active");
+
+function start() {
+    document.getElementById("act1").style.display = "block";
+    runLog();
+}
+
+/* ---------------- ACT 1 ---------------- */
+
+let logs = [
+"Booting AI memory core...",
+"Scanning corrupted sectors...",
+"Fragment found: 84 65 78 65 75 82 73 84",
+"Warning: fake data detected",
+"Rebuilding structure..."
 ];
 
 let i = 0;
 
-function runHack() {
-    screen.innerHTML = "";
-    typeLine();
+function runLog() {
+    let logBox = document.getElementById("log");
+
+    let interval = setInterval(() => {
+        if (i < logs.length) {
+            logBox.innerHTML += logs[i] + "\n";
+            i++;
+        } else {
+            clearInterval(interval);
+            document.getElementById("act2").style.display = "block";
+            loadBlocks();
+        }
+    }, 800);
 }
 
-function typeLine() {
-    if (i < text.length) {
-        screen.innerHTML += text[i] + "\\n";
-        i++;
-        setTimeout(typeLine, 800);
-    } else {
-        document.getElementById("puzzle").style.display = "block";
+/* ---------------- ACT 2 ---------------- */
+
+let fragments = [
+"T", "A", "N", "X",
+"A", "K", "Z", "R",
+"I", "T", "Q", "W"
+];
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
 }
 
-// ASCII decoder
+shuffle(fragments);
+
+function loadBlocks() {
+    let container = document.getElementById("blocks");
+    container.innerHTML = "";
+
+    fragments.forEach(f => {
+        let div = document.createElement("div");
+        div.className = "block";
+        div.innerHTML = f;
+        div.onclick = () => select(div);
+        container.appendChild(div);
+    });
+}
+
+let selected = "";
+
+function select(el) {
+    selected += el.innerText;
+    el.style.opacity = "0.3";
+
+    if (selected.length >= 8) {
+        document.getElementById("act3").style.display = "block";
+    }
+}
+
+/* ---------------- ACT 3 ---------------- */
+
+function finalCheck() {
+    let a = document.getElementById("a").checked;
+    let b = document.getElementById("b").checked;
+    let c = document.getElementById("c").checked;
+
+    if (a && b && !c) {
+        document.getElementById("final").style.display = "block";
+    } else {
+        alert("SYSTEM REJECTED: wrong logic layers");
+    }
+}
+
+/* ---------------- FINAL ---------------- */
+
 function check() {
     let val = document.getElementById("code").value.toLowerCase();
 
     if (val === "tanakrit") {
-        document.getElementById("result").style.display = "block";
+        document.getElementById("win").style.display = "block";
     } else {
-        alert("Wrong. Try converting ASCII numbers.");
+        alert("ACCESS DENIED");
     }
 }
+
 </script>
 
 </body>
