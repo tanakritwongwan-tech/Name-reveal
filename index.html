@@ -102,6 +102,11 @@ input {
     <div class="zone"></div>
 </div>
 
+<p>Press when bar is inside RED zone</p>
+<button onclick="press()">PRESS</button>
+
+<p id="status"></p>
+</div>
 <button onclick="press()">PRESS</button>
 <p id="status"></p>
 </div>
@@ -151,23 +156,14 @@ let letters = ["T","A","N","A","K","R","I","T"];
 /* =========================
    ACT 1 (FIXED BAR GAME)
 ========================= */
+/* =========================
+   MODULE 1 FIXED VERSION
+========================= */
 
 let pos = 0;
-let dir = 2;
+let dir = 1.2;        // slower + smoother
 let started = false;
-
-function moveBar() {
-    if (!started) return;
-
-    let bar = document.getElementById("bar");
-
-    pos += dir;
-    if (pos > 90 || pos < 0) dir *= -1;
-
-    bar.style.left = pos + "%";
-
-    requestAnimationFrame(moveBar);
-}
+let passed = false;   // IMPORTANT: lock progression
 
 function startGame() {
     document.getElementById("act1").style.display = "block";
@@ -175,6 +171,54 @@ function startGame() {
     if (!started) {
         started = true;
         moveBar();
+    }
+}
+
+function moveBar() {
+    if (!started || passed) return;
+
+    const bar = document.getElementById("bar");
+
+    pos += dir;
+
+    if (pos >= 90) dir = -1.2;
+    if (pos <= 0) dir = 1.2;
+
+    bar.style.left = pos + "%";
+
+    requestAnimationFrame(moveBar);
+}
+
+/* =========================
+   PERFECT CENTERED HIT BOX
+   (IMPORTANT FIX)
+========================= */
+
+// RED ZONE is EXACTLY centered and smaller
+const RED_MIN = 45;
+const RED_MAX = 60;
+
+function press() {
+    if (passed) return;
+
+    const status = document.getElementById("status");
+
+    if (pos >= RED_MIN && pos <= RED_MAX) {
+        passed = true;
+
+        status.innerText = "GOOD SIGNAL ✔";
+
+        // STOP BAR immediately
+        started = false;
+
+        // smooth transition to next module
+        setTimeout(() => {
+            document.getElementById("act2").style.display = "block";
+            loadGrid(); // your ACT 2
+        }, 600);
+
+    } else {
+        status.innerText = "MISS ✖";
     }
 }
 
